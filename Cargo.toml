@@ -1,0 +1,19 @@
+[package]
+name = "binary_image"
+version = "0.1.0"
+edition = "2021"
+authors = ["salam99823"]
+keywords = ["image"]
+homepage = "https://github.com/salam99823/binary_image"
+repository = "https://github.com/salam99823/binary_image"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = 0 }
+
+[dependencies]
+image = "0.25"
+rayon = "1.10.0"
+num-traits = "0.2.19"
+bitvec = "1"
