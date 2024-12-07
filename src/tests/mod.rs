@@ -3,10 +3,22 @@ mod pixel;
 
 static DATA: [u8; 16] = [
     1, 0, 0, 0, //
-    0, 0, 1, 0, //
+    0, 1, 1, 0, //
     0, 1, 0, 0, //
     0, 0, 0, 1, //
 ];
+
+#[test]
+fn test_neigbors() {
+    let binary_image = BinaryImage::from_raw(4, 4, &DATA);
+    let neigbors = Neighbors::get_neighbors(&binary_image, 1, 1);
+
+    assert_eq!(neigbors.bits(), 0b1010_0001);
+
+    let neigbors = Neighbors::get_neighbors(&binary_image, 2, 2);
+
+    assert_eq!(neigbors.bits(), 0b0101_1001);
+}
 
 #[test]
 fn test_binary_image_creation() {
