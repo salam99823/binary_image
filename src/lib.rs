@@ -44,7 +44,7 @@ bitflags::bitflags! {
 }
 
 impl Neighbors {
-    fn get_neighbors<I>(image: &I, x: u32, y: u32) -> Self
+    pub fn get_neighbors<I>(image: &I, x: u32, y: u32) -> Self
     where
         I: GenericImageView<Pixel = Bit>,
     {
