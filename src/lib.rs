@@ -45,34 +45,65 @@ bitflags::bitflags! {
 
 impl Neighbors {
     #[must_use]
-    pub fn get_neighbors<I>(image: &I, x: u32, y: u32) -> Self
+    pub fn get_neighbors<I>(image: &I, mut x: u32, mut y: u32) -> Self
     where
         I: GenericImageView<Pixel = Bit>,
     {
         let mut neighbors = Neighbors::empty();
-        if y < u32::MAX && *image.get_pixel(x, y + 1) {
-            neighbors |= Neighbors::NORTH;
+        if y < u32::MAX {
+            y += 1;
+            if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                neighbors |= Neighbors::NORTH;
+            }
+            if x < u32::MAX {
+                x += 1;
+                if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                    neighbors |= Neighbors::NORTHEAST;
+                }
+                x -= 1;
+            }
+            if x > u32::MIN {
+                x -= 1;
+                if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                    neighbors |= Neighbors::NORTHWEST;
+                }
+                x += 1;
+            }
+            y -= 1;
         }
-        if y > u32::MIN && *image.get_pixel(x, y - 1) {
-            neighbors |= Neighbors::SOUTH;
+        if x < u32::MAX {
+            x += 1;
+            if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                neighbors |= Neighbors::EAST;
+            }
+            if y > u32::MIN {
+                y -= 1;
+                if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                    neighbors |= Neighbors::SOUTHEAST;
+                }
+                y += 1;
+            }
+            x -= 1;
         }
-        if x < u32::MAX && *image.get_pixel(x + 1, y) {
-            neighbors |= Neighbors::EAST;
+        if y > u32::MIN {
+            y -= 1;
+            if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                neighbors |= Neighbors::SOUTH;
+            }
+            if x > u32::MIN {
+                x -= 1;
+                if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                    neighbors |= Neighbors::SOUTHWEST;
+                }
+                x += 1;
+            }
+            y += 1;
         }
-        if x > u32::MIN && *image.get_pixel(x - 1, y) {
-            neighbors |= Neighbors::WEST;
-        }
-        if x < u32::MAX && y < u32::MAX && *image.get_pixel(x + 1, y + 1) {
-            neighbors |= Neighbors::NORTHEAST;
-        }
-        if x > u32::MIN && y < u32::MAX && *image.get_pixel(x - 1, y + 1) {
-            neighbors |= Neighbors::NORTHWEST;
-        }
-        if x < u32::MAX && y > u32::MIN && *image.get_pixel(x + 1, y - 1) {
-            neighbors |= Neighbors::SOUTHEAST;
-        }
-        if x > u32::MIN && y > u32::MIN && *image.get_pixel(x - 1, y - 1) {
-            neighbors |= Neighbors::SOUTHWEST;
+        if x > u32::MIN {
+            x -= 1;
+            if image.in_bounds(x, y) && *image.get_pixel(x, y) {
+                neighbors |= Neighbors::WEST;
+            }
         }
         neighbors
     }
