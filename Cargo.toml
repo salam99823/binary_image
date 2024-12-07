@@ -17,7 +17,7 @@ include = ["/LICENSE-APACHE", "/LICENSE-MIT", "/README.md", "/src/"]
 pedantic = { level = "warn", priority = 0 }
 
 [dependencies]
-image = "0.25"
+image = { version = "0.25", default-features = false }
 bitflags = "2.6"
 num-traits = "0.2"
 derive_more = { version = "1", features = ["full"] }
