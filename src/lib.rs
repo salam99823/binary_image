@@ -6,6 +6,8 @@ use num_traits::Zero;
 pub use pixel::Bit;
 
 mod pixel;
+#[cfg(test)]
+mod tests;
 mod utils;
 
 bitflags::bitflags! {
