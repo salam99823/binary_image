@@ -10,6 +10,9 @@ repository = "https://github.com/salam99823/binary_image"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 
+exclude = ["assets/*", ".github/*", "examples/*"]
+include = ["/LICENSE-APACHE", "/LICENSE-MIT", "/README.md", "/src/"]
+
 [lints.clippy]
 pedantic = { level = "warn", priority = 0 }
 
@@ -17,4 +20,5 @@ pedantic = { level = "warn", priority = 0 }
 image = "0.25"
 bitflags = "2.6.0"
 num-traits = "0.2.19"
+derive_more = { version = "1", features = ["full"] }
 bit-vec = "0.8.0"

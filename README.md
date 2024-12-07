@@ -8,8 +8,8 @@ manipulating binary pixel data, making it suitable for image processing tasks.
 
 - **Binary Pixel Representation**:
   Efficiently represent and manipulate binary pixels
-  using `BinaryPixel` and `Bit` structures.
-- **Conversion**: Easily convert between `bool`, `Bit`, and `BinaryPixel` types.
+  using `Bit` structure.
+- **Conversion**: Easily convert between `bool`, `Bit` types.
 - **Image Processing**: Convert pixels to various
   formats such as RGB, grayscale, and more.
 - **Trait Implementations**: Implements traits from the `num_traits`
@@ -28,4 +28,3 @@ binary_image = "0.1.0"
 
 - MIT License
 - Apache License 2.0
-

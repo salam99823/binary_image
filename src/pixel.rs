@@ -1,13 +1,42 @@
 #![allow(clippy::suspicious_arithmetic_impl, clippy::module_name_repetitions)]
+use derive_more::{
+    derive::{BitAnd, BitOr, BitXor, Shl, ShlAssign, Shr, ShrAssign},
+    AsMut, AsRef, BitAndAssign, BitOrAssign, BitXorAssign, Deref, DerefMut, Display, From, Into,
+    Not,
+};
 use num_traits::{One, Zero};
 
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
-pub struct Pixel(pub [Bit; 1]);
-
-#[repr(transparent)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
-pub struct Bit(bool);
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Display,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deref,
+    DerefMut,
+    AsMut,
+    AsRef,
+    Not,
+    BitOrAssign,
+    BitAndAssign,
+    BitXorAssign,
+    ShlAssign,
+    ShrAssign,
+    BitOr,
+    BitAnd,
+    BitXor,
+    Shl,
+    Shr,
+    Into,
+    From,
+)]
+pub struct Bit(pub bool);
 
 impl std::ops::AddAssign for Bit {
     fn add_assign(&mut self, rhs: Self) {
@@ -71,14 +100,6 @@ impl std::ops::Rem for Bit {
     fn rem(self, rhs: Self) -> Self::Output {
         debug_assert!(*rhs, "Cannot divide by zero");
         Self(false)
-    }
-}
-
-impl std::ops::Not for Bit {
-    type Output = Self;
-    fn not(mut self) -> Self::Output {
-        self.0 = !*self;
-        self
     }
 }
 
@@ -150,21 +171,21 @@ impl image::Primitive for Bit {
     const DEFAULT_MIN_VALUE: Self = Self(false);
 }
 
-impl image::Pixel for Pixel {
-    type Subpixel = Bit;
+impl image::Pixel for Bit {
+    type Subpixel = Self;
     const CHANNEL_COUNT: u8 = 1;
     const COLOR_MODEL: &'static str = "BLACKANDWHITE";
-    fn channels(&self) -> &[Self::Subpixel] {
-        self.as_ref()
+    fn channels(&self) -> &[Self] {
+        unimplemented!()
     }
-    fn channels_mut(&mut self) -> &mut [Self::Subpixel] {
-        self.as_mut()
+    fn channels_mut(&mut self) -> &mut [Self] {
+        unimplemented!()
     }
-    fn from_slice(slice: &[Self::Subpixel]) -> &Self {
+    fn from_slice(slice: &[Self]) -> &Self {
         assert_eq!(slice.len(), 1);
         unsafe { &*slice.as_ptr().cast() }
     }
-    fn from_slice_mut(slice: &mut [Self::Subpixel]) -> &mut Self {
+    fn from_slice_mut(slice: &mut [Self]) -> &mut Self {
         assert_eq!(slice.len(), 1);
         unsafe { &mut *slice.as_mut_ptr().cast() }
     }
@@ -174,15 +195,15 @@ impl image::Pixel for Pixel {
     fn to_rgba(&self) -> image::Rgba<Bit> {
         image::Rgba([if **self { One::one() } else { Zero::zero() }; 4])
     }
-    fn to_luma(&self) -> image::Luma<Self::Subpixel> {
+    fn to_luma(&self) -> image::Luma<Self> {
         image::Luma([if **self { One::one() } else { Zero::zero() }])
     }
-    fn to_luma_alpha(&self) -> image::LumaA<Self::Subpixel> {
+    fn to_luma_alpha(&self) -> image::LumaA<Self> {
         image::LumaA([if **self { One::one() } else { Zero::zero() }; 2])
     }
     fn map<F>(&self, f: F) -> Self
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
     {
         let mut this = *self;
         this.apply(f);
@@ -190,8 +211,8 @@ impl image::Pixel for Pixel {
     }
     fn map_with_alpha<F, G>(&self, f: F, _: G) -> Self
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
-        G: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
+        G: FnMut(Self) -> Self,
     {
         let mut this = *self;
         this.apply(f);
@@ -199,20 +220,20 @@ impl image::Pixel for Pixel {
     }
     fn apply<F>(&mut self, mut f: F)
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
     {
-        self.0[0] = f(self.0[0]);
+        self.0 = *f(*self);
     }
     fn apply_with_alpha<F, G>(&mut self, f: F, _: G)
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
-        G: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
+        G: FnMut(Self) -> Self,
     {
         self.apply(f);
     }
     fn map2<F>(&self, other: &Self, f: F) -> Self
     where
-        F: FnMut(Self::Subpixel, Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self, Self) -> Self,
     {
         let mut this = *self;
         this.apply2(other, f);
@@ -220,29 +241,22 @@ impl image::Pixel for Pixel {
     }
     fn apply2<F>(&mut self, other: &Self, mut f: F)
     where
-        F: FnMut(Self::Subpixel, Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self, Self) -> Self,
     {
-        self.0[0] = f(self.0[0], other.0[0]);
+        self.0 = *f(*self, *other);
     }
     fn invert(&mut self) {
-        self.0[0] = !self.0[0];
+        self.0 = !self.0;
     }
     fn blend(&mut self, other: &Self) {
-        self.0[0] -= other.0[0];
+        *self -= *other;
     }
-    fn channels4(
-        &self,
-    ) -> (
-        Self::Subpixel,
-        Self::Subpixel,
-        Self::Subpixel,
-        Self::Subpixel,
-    ) {
-        (self.0[0], self.0[0], self.0[0], self.0[0])
+    fn channels4(&self) -> (Self, Self, Self, Self) {
+        (*self, *self, *self, *self)
     }
     fn map_without_alpha<F>(&self, f: F) -> Self
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
     {
         let mut new = *self;
         new.apply_without_alpha(f);
@@ -250,66 +264,11 @@ impl image::Pixel for Pixel {
     }
     fn apply_without_alpha<F>(&mut self, f: F)
     where
-        F: FnMut(Self::Subpixel) -> Self::Subpixel,
+        F: FnMut(Self) -> Self,
     {
         self.apply(f);
     }
-    fn from_channels(
-        a: Self::Subpixel,
-        b: Self::Subpixel,
-        c: Self::Subpixel,
-        d: Self::Subpixel,
-    ) -> Self {
-        Self([a + b + c + d])
-    }
-}
-
-impl std::ops::Deref for Bit {
-    type Target = bool;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl std::ops::Deref for Pixel {
-    type Target = bool;
-    fn deref(&self) -> &Self::Target {
-        &self.0[0]
-    }
-}
-
-impl From<bool> for Bit {
-    fn from(value: bool) -> Self {
-        Self(value)
-    }
-}
-
-impl From<Bit> for Pixel {
-    fn from(value: Bit) -> Self {
-        Self([value])
-    }
-}
-
-impl From<Bit> for bool {
-    fn from(value: Bit) -> Self {
-        *value
-    }
-}
-
-impl From<Pixel> for bool {
-    fn from(value: Pixel) -> Self {
-        *value
-    }
-}
-
-impl AsRef<[Bit]> for Pixel {
-    fn as_ref(&self) -> &[Bit] {
-        &self.0
-    }
-}
-
-impl AsMut<[Bit]> for Pixel {
-    fn as_mut(&mut self) -> &mut [Bit] {
-        &mut self.0
+    fn from_channels(a: Self, b: Self, c: Self, d: Self) -> Self {
+        Self(*(a | b | c | d))
     }
 }
