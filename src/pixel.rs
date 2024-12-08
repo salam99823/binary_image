@@ -264,3 +264,45 @@ impl image::Pixel for Bit {
         Self(*(a | b | c | d))
     }
 }
+
+impl<T: image::Primitive> From<image::Rgb<T>> for Bit {
+    fn from(pixel: image::Rgb<T>) -> Self {
+        Self(!pixel.0.iter().all(Zero::is_zero))
+    }
+}
+impl<T: image::Primitive> From<image::Luma<T>> for Bit {
+    fn from(pixel: image::Luma<T>) -> Self {
+        Self(!pixel.0[0].is_zero())
+    }
+}
+impl<T: image::Primitive> From<image::Rgba<T>> for Bit {
+    fn from(pixel: image::Rgba<T>) -> Self {
+        Self(!pixel.0[3].is_zero())
+    }
+}
+impl<T: image::Primitive> From<image::LumaA<T>> for Bit {
+    fn from(pixel: image::LumaA<T>) -> Self {
+        Self(!pixel.0[1].is_zero())
+    }
+}
+
+impl<T: image::Primitive> From<&image::Rgb<T>> for Bit {
+    fn from(pixel: &image::Rgb<T>) -> Self {
+        Self(!pixel.0.iter().all(Zero::is_zero))
+    }
+}
+impl<T: image::Primitive> From<&image::Luma<T>> for Bit {
+    fn from(pixel: &image::Luma<T>) -> Self {
+        Self(!pixel.0[0].is_zero())
+    }
+}
+impl<T: image::Primitive> From<&image::Rgba<T>> for Bit {
+    fn from(pixel: &image::Rgba<T>) -> Self {
+        Self(!pixel.0[3].is_zero())
+    }
+}
+impl<T: image::Primitive> From<&image::LumaA<T>> for Bit {
+    fn from(pixel: &image::LumaA<T>) -> Self {
+        Self(!pixel.0[1].is_zero())
+    }
+}

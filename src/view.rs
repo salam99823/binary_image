@@ -1,40 +1,23 @@
 #![allow(clippy::module_name_repetitions)]
 use derive_more::{Constructor, Deref, DerefMut, From};
-use image::{GenericImageView, Pixel};
-use num_traits::Zero;
-
-use crate::pixel::Bit;
 
 #[derive(Debug, Clone, DerefMut, Deref, From, Constructor)]
-pub struct BinaryView<'a, I>(pub &'a I)
-where
-    I: GenericImageView;
+pub struct BinaryView<'a, I: image::GenericImageView>(pub &'a I);
 
-impl<'a, I> GenericImageView for BinaryView<'a, I>
+impl<'a, I, P> image::GenericImageView for BinaryView<'a, I>
 where
-    I: GenericImageView,
+    I: image::GenericImageView<Pixel = P>,
+    P: image::Pixel,
+    crate::Bit: From<P>,
 {
-    type Pixel = Bit;
+    type Pixel = crate::Bit;
     #[inline]
     unsafe fn unsafe_get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
-        let pixel = self.0.unsafe_get_pixel(x, y);
-        let (mut channels, mut alphas, mut alpha_exist) = (false, false, false);
-        pixel.map_with_alpha(
-            |channel| {
-                channels |= !channel.is_zero();
-                channel
-            },
-            |alpha| {
-                alpha_exist = true;
-                alphas |= !alpha.is_zero();
-                alpha
-            },
-        );
-        Bit(if alpha_exist { alphas } else { channels })
+        crate::Bit::from(self.0.unsafe_get_pixel(x, y))
     }
     #[inline]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
-        debug_assert!(self.0.in_bounds(x, y));
+        debug_assert!(self.0.in_bounds(x, y), "Pixel out of bounds");
         unsafe { self.unsafe_get_pixel(x, y) }
     }
     #[inline]
