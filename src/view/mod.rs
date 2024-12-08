@@ -32,7 +32,7 @@ where
                 alpha
             },
         );
-        Bit::from(channels ^ alpha_exist | alphas)
+        Bit::from(if alpha_exist { alphas } else { channels })
     }
     #[inline]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
