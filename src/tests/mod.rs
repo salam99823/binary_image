@@ -18,6 +18,10 @@ fn test_neigbors() {
     let neigbors = Neighbors::get_neighbors(&binary_image, 2, 2);
 
     assert_eq!(neigbors.bits(), 0b0101_1001);
+
+    let neigbors = Neighbors::get_neighbors(&binary_image, 0, 0);
+
+    assert_eq!(neigbors.bits(), 0b0000_1000);
 }
 
 #[test]
