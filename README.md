@@ -20,7 +20,8 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-binary_image = "1"
+# replace "*" with the most recent version of binary_image
+binary_image = "*"
 ```
 
 ## License
