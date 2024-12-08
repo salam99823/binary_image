@@ -25,7 +25,7 @@ jobs:
 
       - name: rustfmt check
         run: cargo fmt --all -- --check
-  
+
   clippy:
     needs: [format]
     runs-on: macos-latest
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: rustup component add clippy
       - name: cargo clippy
-        run: cargo clippy --all-features --all-targets 
+        run: cargo clippy --all-features --all-targets
 
   test:
     needs: [format]
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: cargo test
-        run: cargo test --features bevy
+        run: cargo test
 
   macos-latest-stable:
     needs: [format]
@@ -117,4 +117,3 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-
