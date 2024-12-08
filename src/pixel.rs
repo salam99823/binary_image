@@ -201,22 +201,18 @@ impl image::Pixel for Bit {
     fn to_luma_alpha(&self) -> image::LumaA<Self> {
         image::LumaA([if **self { One::one() } else { Zero::zero() }; 2])
     }
-    fn map<F>(&self, f: F) -> Self
+    fn map<F>(&self, mut f: F) -> Self
     where
         F: FnMut(Self) -> Self,
     {
-        let mut this = *self;
-        this.apply(f);
-        this
+        Self(*f(*self))
     }
-    fn map_with_alpha<F, G>(&self, f: F, _: G) -> Self
+    fn map_with_alpha<F, G>(&self, mut f: F, _: G) -> Self
     where
         F: FnMut(Self) -> Self,
         G: FnMut(Self) -> Self,
     {
-        let mut this = *self;
-        this.apply(f);
-        this
+        Self(*f(*self))
     }
     fn apply<F>(&mut self, mut f: F)
     where
@@ -231,13 +227,11 @@ impl image::Pixel for Bit {
     {
         self.apply(f);
     }
-    fn map2<F>(&self, other: &Self, f: F) -> Self
+    fn map2<F>(&self, other: &Self, mut f: F) -> Self
     where
         F: FnMut(Self, Self) -> Self,
     {
-        let mut this = *self;
-        this.apply2(other, f);
-        this
+        Self(*f(*self, *other))
     }
     fn apply2<F>(&mut self, other: &Self, mut f: F)
     where
@@ -254,13 +248,11 @@ impl image::Pixel for Bit {
     fn channels4(&self) -> (Self, Self, Self, Self) {
         (*self, *self, *self, *self)
     }
-    fn map_without_alpha<F>(&self, f: F) -> Self
+    fn map_without_alpha<F>(&self, mut f: F) -> Self
     where
         F: FnMut(Self) -> Self,
     {
-        let mut new = *self;
-        new.apply_without_alpha(f);
-        new
+        Self(*f(*self))
     }
     fn apply_without_alpha<F>(&mut self, f: F)
     where
