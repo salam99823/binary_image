@@ -83,3 +83,13 @@ impl image::GenericImage for BinaryImage {
         unimplemented!()
     }
 }
+
+impl<I: GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
+    fn from(view: &I) -> Self {
+        BinaryImage {
+            height: view.height(),
+            width: view.width(),
+            data: view.pixels().map(|(_, _, pixel)| *pixel).collect(),
+        }
+    }
+}
