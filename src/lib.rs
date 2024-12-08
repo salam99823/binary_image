@@ -4,7 +4,7 @@ use image::GenericImageView;
 
 pub use neigbors::Neighbors;
 pub use pixel::Bit;
-pub use view::{raw::BinaryRawView, BinaryView};
+pub use view::BinaryView;
 
 mod neigbors;
 mod pixel;
@@ -41,7 +41,7 @@ impl BinaryImage {
     }
 }
 
-impl GenericImageView for BinaryImage {
+impl image::GenericImageView for BinaryImage {
     type Pixel = pixel::Bit;
     #[inline]
     unsafe fn unsafe_get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
@@ -84,7 +84,7 @@ impl image::GenericImage for BinaryImage {
     }
 }
 
-impl<I: GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
+impl<I: image::GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
     fn from(view: &I) -> Self {
         BinaryImage {
             height: view.height(),

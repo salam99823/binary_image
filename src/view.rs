@@ -5,8 +5,6 @@ use num_traits::Zero;
 
 use crate::pixel::Bit;
 
-pub mod raw;
-
 #[derive(Debug, Clone, DerefMut, Deref, From, Constructor)]
 pub struct BinaryView<'a, I>(pub &'a I)
 where
@@ -32,7 +30,7 @@ where
                 alpha
             },
         );
-        Bit::from(if alpha_exist { alphas } else { channels })
+        Bit(if alpha_exist { alphas } else { channels })
     }
     #[inline]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
