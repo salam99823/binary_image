@@ -1,4 +1,4 @@
-#![allow(clippy::suspicious_arithmetic_impl, clippy::module_name_repetitions)]
+#![allow(clippy::suspicious_arithmetic_impl)]
 use derive_more::{
     derive::{BitAnd, BitOr, BitXor, Shl, ShlAssign, Shr, ShrAssign},
     AsMut, AsRef, BitAndAssign, BitOrAssign, BitXorAssign, Deref, DerefMut, Display, From, Into,
