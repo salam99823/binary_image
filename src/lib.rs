@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use bit_vec::BitVec;
-use image::{GenericImage, GenericImageView};
+use image::{GenericImageView, Pixel};
 
 pub use neigbors::Neighbors;
 pub use pixel::Bit;
@@ -66,8 +66,8 @@ impl BinaryImage {
     }
 }
 
-impl image::GenericImageView for BinaryImage {
-    type Pixel = pixel::Bit;
+impl GenericImageView for BinaryImage {
+    type Pixel = Bit;
     #[inline]
     unsafe fn unsafe_get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
         Bit::from(self.buffer.get_unchecked((y * self.width + x) as usize))
@@ -111,7 +111,7 @@ impl image::GenericImage for BinaryImage {
     }
 }
 
-impl<I: image::GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
+impl<I: GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
     fn from(view: &I) -> Self {
         BinaryImage {
             height: view.height(),
@@ -142,16 +142,11 @@ impl From<image::DynamicImage> for BinaryImage {
 impl<Container, P> From<image::ImageBuffer<P, Container>> for BinaryImage
 where
     Container: std::ops::Deref<Target = [P::Subpixel]>,
-    P: image::Pixel,
+    P: Pixel,
     Bit: From<P>,
 {
     fn from(image: image::ImageBuffer<P, Container>) -> Self {
-        let mut new = Self::new(image.width(), image.height());
-        for x in 0..image.width() {
-            for y in 0..image.height() {
-                new.put_pixel(x, y, Bit::from(*image.get_pixel(x, y)));
-            }
-        }
-        new
+        let buf = image.pixels().map(|pixel| Bit::from(*pixel).0).collect();
+        BinaryImage::from_bitvec(image.width(), image.height(), buf)
     }
 }
