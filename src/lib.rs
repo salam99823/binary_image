@@ -17,7 +17,7 @@ mod view;
 pub struct BinaryImage {
     width: u32,
     height: u32,
-    buf: bit_vec::BitVec,
+    buffer: bit_vec::BitVec,
 }
 
 impl BinaryImage {
@@ -26,23 +26,23 @@ impl BinaryImage {
         Self {
             width,
             height,
-            buf: BitVec::with_capacity((width * height) as usize),
+            buffer: BitVec::with_capacity((width * height) as usize),
         }
     }
 
     #[must_use]
-    pub fn from_raw<T>(width: u32, height: u32, buf: &[T]) -> Self
+    pub fn from_raw<T>(width: u32, height: u32, buffer: &[T]) -> Self
     where
         T: num_traits::Zero,
     {
         let image_size = (width * height) as usize;
         debug_assert!(
-            buf.len() >= image_size,
+            buffer.len() >= image_size,
             "Buffer must not be smaller than image dimensions"
         );
-        let compress_step = buf.len() / image_size;
+        let compress_step = buffer.len() / image_size;
         Self {
-            buf: buf
+            buffer: buffer
                 .chunks(compress_step)
                 .map(|pixel| !pixel.iter().any(num_traits::Zero::is_zero))
                 .collect(),
@@ -52,13 +52,17 @@ impl BinaryImage {
     }
 
     #[must_use]
-    pub fn from_bitvec(width: u32, height: u32, buf: bit_vec::BitVec) -> Self {
+    pub fn from_bitvec(width: u32, height: u32, buffer: bit_vec::BitVec) -> Self {
         let image_size = (width * height) as usize;
         debug_assert!(
-            buf.len() >= image_size,
+            buffer.len() >= image_size,
             "Buffer must not be smaller than image dimensions"
         );
-        Self { width, height, buf }
+        Self {
+            width,
+            height,
+            buffer,
+        }
     }
 }
 
@@ -66,7 +70,7 @@ impl image::GenericImageView for BinaryImage {
     type Pixel = pixel::Bit;
     #[inline]
     unsafe fn unsafe_get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
-        Bit::from(self.buf.get_unchecked((y * self.width + x) as usize))
+        Bit::from(self.buffer.get_unchecked((y * self.width + x) as usize))
     }
     #[inline]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
@@ -90,7 +94,7 @@ impl image::GenericImageView for BinaryImage {
 impl image::GenericImage for BinaryImage {
     #[inline]
     unsafe fn unsafe_put_pixel(&mut self, x: u32, y: u32, pixel: Self::Pixel) {
-        self.buf.set((y * self.width + x) as usize, *pixel);
+        self.buffer.set((y * self.width + x) as usize, *pixel);
     }
     #[inline]
     fn put_pixel(&mut self, x: u32, y: u32, pixel: Self::Pixel) {
@@ -112,7 +116,7 @@ impl<I: image::GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
         BinaryImage {
             height: view.height(),
             width: view.width(),
-            buf: view.pixels().map(|(_, _, pixel)| *pixel).collect(),
+            buffer: view.pixels().map(|(_, _, pixel)| *pixel).collect(),
         }
     }
 }
