@@ -97,8 +97,10 @@ impl image::GenericImage for BinaryImage {
         debug_assert!(self.in_bounds(x, y));
         unsafe { self.unsafe_put_pixel(x, y, pixel) }
     }
-    fn blend_pixel(&mut self, _: u32, _: u32, _: Self::Pixel) {
-        unimplemented!()
+    fn blend_pixel(&mut self, x: u32, y: u32, other: Self::Pixel) {
+        let mut pixel = self.get_pixel(x, y);
+        pixel.blend(&other);
+        self.put_pixel(x, y, pixel);
     }
     fn get_pixel_mut(&mut self, _: u32, _: u32) -> &mut Self::Pixel {
         unimplemented!()
