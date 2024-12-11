@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: cargo test
-        run: cargo test
+        run: cargo test --all-features --all-targets
 
   macos-latest-stable:
     needs: [format]
