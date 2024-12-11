@@ -1,35 +1,72 @@
 #![allow(clippy::module_name_repetitions)]
-use derive_more::{Constructor, Deref, DerefMut, From};
+use std::ops::Deref;
 
-#[derive(Debug, Clone, DerefMut, Deref, From, Constructor)]
-pub struct BinaryView<'a, I: image::GenericImageView>(pub &'a I);
+use image::{GenericImageView, Pixel};
 
-impl<'a, I, P> image::GenericImageView for BinaryView<'a, I>
+use crate::BinaryImage;
+
+#[derive(Debug, Clone, Copy)]
+pub enum BinaryView<'a, I: GenericImageView> {
+    Ref(&'a I),
+    Image(I),
+}
+
+impl<'a, I, P> GenericImageView for BinaryView<'a, I>
 where
-    I: image::GenericImageView<Pixel = P>,
-    P: image::Pixel,
+    I: GenericImageView<Pixel = P>,
+    P: Pixel,
     crate::Bit: From<P>,
 {
     type Pixel = crate::Bit;
     #[inline]
     unsafe fn unsafe_get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
-        crate::Bit::from(self.0.unsafe_get_pixel(x, y))
+        crate::Bit::from(self.deref().unsafe_get_pixel(x, y))
     }
     #[inline]
     fn get_pixel(&self, x: u32, y: u32) -> Self::Pixel {
-        debug_assert!(self.0.in_bounds(x, y), "Pixel out of bounds");
+        debug_assert!(self.deref().in_bounds(x, y), "Pixel out of bounds");
         unsafe { self.unsafe_get_pixel(x, y) }
     }
     #[inline]
     fn dimensions(&self) -> (u32, u32) {
-        self.0.dimensions()
+        self.deref().dimensions()
     }
     #[inline]
     fn height(&self) -> u32 {
-        self.0.height()
+        self.deref().height()
     }
     #[inline]
     fn width(&self) -> u32 {
-        self.0.width()
+        self.deref().width()
+    }
+}
+
+impl<'a, I, P> Deref for BinaryView<'a, I>
+where
+    I: GenericImageView<Pixel = P>,
+    P: Pixel,
+    crate::Bit: From<P>,
+{
+    type Target = I;
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Ref(image) => image,
+            Self::Image(image) => image,
+        }
+    }
+}
+
+impl<'a, I, P> From<BinaryView<'a, I>> for crate::BinaryImage
+where
+    I: GenericImageView<Pixel = P>,
+    P: Pixel,
+    crate::Bit: From<P>,
+{
+    fn from(view: BinaryView<'a, I>) -> BinaryImage {
+        BinaryImage {
+            height: view.height(),
+            width: view.width(),
+            buffer: view.pixels().map(|(_, _, pixel)| *pixel).collect(),
+        }
     }
 }

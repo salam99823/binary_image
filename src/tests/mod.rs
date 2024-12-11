@@ -1,3 +1,5 @@
+use image::{GenericImage, ImageBuffer, Luma};
+
 use super::*;
 mod pixel;
 
@@ -26,41 +28,29 @@ fn test_neigbors() {
     );
 }
 
+fn test_view<I: GenericImageView<Pixel = Bit>>(image: &I) {
+    for ((_, _, pixel1), pixel2) in image.pixels().zip(DATA) {
+        assert!(!(*pixel1 ^ (pixel2 > 0)));
+    }
+}
+
 #[test]
-fn test_binary_image_creation() {
-    let image = BinaryImage::from_raw(4, 4, &DATA);
+fn test_binary_image() {
+    let mut image = BinaryImage::from_raw(4, 4, &DATA);
 
     assert_eq!(image.width(), 4);
     assert_eq!(image.height(), 4);
-    assert!(*image.get_pixel(0, 0));
-    assert!(*image.get_pixel(2, 1));
-    assert!(*image.get_pixel(1, 2));
-    assert!(*image.get_pixel(3, 3));
+    test_view(&image);
+
+    image.put_pixel(3, 3, Bit(false));
 }
 
 #[test]
-fn test_view() {
-    let image = BinaryImage::from_raw(4, 4, &DATA);
-    let view = BinaryView(&image);
+fn test_binary_view() {
+    let image: ImageBuffer<Luma<u8>, &[u8]> = ImageBuffer::from_raw(4, 4, DATA.as_ref()).unwrap();
+    let view = BinaryView::Ref(&image);
 
     assert_eq!(view.width(), 4);
     assert_eq!(view.height(), 4);
-    assert!(*view.get_pixel(0, 0));
-    assert!(*view.get_pixel(2, 1));
-    assert!(*view.get_pixel(1, 2));
-    assert!(*view.get_pixel(3, 3));
-}
-
-#[test]
-fn test_view_raw() {
-    let image: image::ImageBuffer<image::Luma<u8>, &[u8]> =
-        image::ImageBuffer::from_raw(4, 4, &DATA[..]).unwrap();
-    let view = BinaryView(&image);
-
-    assert_eq!(view.width(), 4);
-    assert_eq!(view.height(), 4);
-    assert!(*view.get_pixel(0, 0));
-    assert!(*view.get_pixel(2, 1));
-    assert!(*view.get_pixel(1, 2));
-    assert!(*view.get_pixel(3, 3));
+    test_view(&view);
 }

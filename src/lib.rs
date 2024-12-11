@@ -7,6 +7,8 @@ pub use neigbors::Neighbors;
 pub use pixel::Bit;
 pub use view::BinaryView;
 
+#[cfg(feature = "bevy")]
+mod bevy;
 mod neigbors;
 mod pixel;
 #[cfg(test)]
@@ -111,16 +113,6 @@ impl image::GenericImage for BinaryImage {
     }
 }
 
-impl<I: GenericImageView<Pixel = Bit>> From<&I> for BinaryImage {
-    fn from(view: &I) -> Self {
-        BinaryImage {
-            height: view.height(),
-            width: view.width(),
-            buffer: view.pixels().map(|(_, _, pixel)| *pixel).collect(),
-        }
-    }
-}
-
 impl From<image::DynamicImage> for BinaryImage {
     fn from(image: image::DynamicImage) -> Self {
         match image {
@@ -146,7 +138,7 @@ where
     Bit: From<P>,
 {
     fn from(image: image::ImageBuffer<P, Container>) -> Self {
-        let buf = image.pixels().map(|pixel| Bit::from(*pixel).0).collect();
-        BinaryImage::from_bitvec(image.width(), image.height(), buf)
+        let buffer = image.pixels().map(|pixel| Bit::from(*pixel).0).collect();
+        BinaryImage::from_bitvec(image.width(), image.height(), buffer)
     }
 }

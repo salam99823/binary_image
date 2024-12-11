@@ -18,7 +18,7 @@ pedantic = { level = "warn", priority = 0 }
 
 [features]
 default = []
-rayon = ["dep:rayon"]
+bevy = ["dep:bevy_image", "dep:bevy_render"]
 
 [dependencies]
 image = { version = "0.25", default-features = false }
@@ -26,4 +26,18 @@ derive_more = { version = "1", features = ["full"] }
 num-traits = "0.2"
 bitflags = "2.6"
 bit-vec = { version = "0.8" }
-rayon = { version = "1", optional = true }
+
+[dependencies.bevy_image]
+version = "0.15"
+default-features = false
+optional = true
+
+[dependencies.bevy_render]
+version = "0.15"
+default-features = false
+optional = true
+
+[dev-dependencies.bevy_image]
+version = "0.15"
+default-features = false
+features = ["png"]
