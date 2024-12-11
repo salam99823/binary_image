@@ -8,7 +8,7 @@ pub use pixel::Bit;
 pub use view::BinaryView;
 
 #[cfg(feature = "bevy")]
-mod bevy;
+pub mod bevy;
 mod neigbors;
 mod pixel;
 #[cfg(test)]
