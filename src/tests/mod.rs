@@ -15,15 +15,15 @@ fn test_neigbors() {
     let binary_image = BinaryImage::from_raw(4, 4, &DATA);
 
     assert_eq!(
-        Neighbors::get_neighbors(&binary_image, 1, 1).bits(),
+        Neighbors::from_image(&binary_image, 1, 1).bits(),
         0b1010_0001
     );
     assert_eq!(
-        Neighbors::get_neighbors(&binary_image, 2, 2).bits(),
+        Neighbors::from_image(&binary_image, 2, 2).bits(),
         0b0101_1001
     );
     assert_eq!(
-        Neighbors::get_neighbors(&binary_image, 0, 0).bits(),
+        Neighbors::from_image(&binary_image, 0, 0).bits(),
         0b0000_1000
     );
 }

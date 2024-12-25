@@ -38,7 +38,7 @@ bitflags::bitflags! {
 
 impl Neighbors {
     #[must_use]
-    pub fn get_neighbors<I>(image: &I, mut x: u32, mut y: u32) -> Self
+    pub fn from_image<I>(image: &I, mut x: u32, mut y: u32) -> Self
     where
         I: GenericImageView<Pixel = Bit>,
     {
@@ -103,31 +103,30 @@ impl Neighbors {
 
     #[inline]
     #[must_use]
-    pub fn is_corner<I>(image: &I, x: u32, y: u32) -> bool
+    pub fn is_corner<I>(self) -> bool
     where
         I: GenericImageView<Pixel = Bit>,
     {
-        *image.get_pixel(x, y)
-            && !matches!(
-                Self::get_neighbors(image, x, y).bits(),
-                255
-                    | 239
-                    | 238
-                    | 235
-                    | 234
-                    | 223
-                    | 221
-                    | 215
-                    | 213
-                    | 188..=207
-                    | 127
-                    | 123
-                    | 119
-                    | 115
-                    | 48..=63
-                    | 9
-                    | 6
-                    | 0
-            )
+        !matches!(
+            self.bits(),
+            255
+                | 239
+                | 238
+                | 235
+                | 234
+                | 223
+                | 221
+                | 215
+                | 213
+                | 188..=207
+                | 127
+                | 123
+                | 119
+                | 115
+                | 48..=63
+                | 9
+                | 6
+                | 0
+        )
     }
 }
