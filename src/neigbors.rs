@@ -103,10 +103,7 @@ impl Neighbors {
 
     #[inline]
     #[must_use]
-    pub fn is_corner<I>(self) -> bool
-    where
-        I: GenericImageView<Pixel = Bit>,
-    {
+    pub fn is_corner(self) -> bool {
         !matches!(
             self.bits(),
             255
