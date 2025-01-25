@@ -94,6 +94,12 @@ impl BinaryImage {
 
     #[inline]
     #[must_use]
+    pub fn get_pixel(&self, x: u32, y: u32) -> Bit {
+        GenericImageView::get_pixel(self, x, y)
+    }
+
+    #[inline]
+    #[must_use]
     pub fn height(&self) -> u32 {
         self.height
     }
