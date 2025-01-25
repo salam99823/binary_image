@@ -3,13 +3,11 @@
 use bit_vec::BitVec;
 use image::{GenericImage, GenericImageView, Pixel};
 
-pub use neigbors::Neighbors;
 pub use pixel::Bit;
 pub use view::BinaryView;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
-mod neigbors;
 mod pixel;
 #[cfg(test)]
 mod tests;

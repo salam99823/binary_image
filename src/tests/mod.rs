@@ -10,24 +10,6 @@ static DATA: [u8; 16] = [
     0, 0, 0, 1, //
 ];
 
-#[test]
-fn test_neigbors() {
-    let binary_image = BinaryImage::from_raw(4, 4, &DATA);
-
-    assert_eq!(
-        Neighbors::from_image(&binary_image, 1, 1).bits(),
-        0b1010_0001
-    );
-    assert_eq!(
-        Neighbors::from_image(&binary_image, 2, 2).bits(),
-        0b0101_1001
-    );
-    assert_eq!(
-        Neighbors::from_image(&binary_image, 0, 0).bits(),
-        0b0000_1000
-    );
-}
-
 fn test_view<I: GenericImageView<Pixel = Bit>>(image: &I) {
     for ((_, _, pixel1), pixel2) in image.pixels().zip(DATA) {
         assert!(!(*pixel1 ^ (pixel2 > 0)));
