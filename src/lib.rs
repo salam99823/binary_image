@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use bit_vec::BitVec;
-use image::{GenericImageView, Pixel};
+use image::{GenericImage, GenericImageView, Pixel};
 
 pub use neigbors::Neighbors;
 pub use pixel::Bit;
@@ -65,6 +65,32 @@ impl BinaryImage {
             height,
             buffer,
         }
+    }
+
+    /// Flip an image horizontally
+    #[must_use]
+    pub fn flip_horizontal(&self) -> Self {
+        let (width, height) = self.dimensions();
+        let mut out = Self::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                out.put_pixel(width - x - 1, y, self.get_pixel(x, y));
+            }
+        }
+        out
+    }
+
+    /// Flip an image vertically
+    #[must_use]
+    pub fn flip_vertical(&self) -> Self {
+        let (width, height) = self.dimensions();
+        let mut out = Self::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                out.put_pixel(x, height - 1 - y, self.get_pixel(x, y));
+            }
+        }
+        out
     }
 }
 
