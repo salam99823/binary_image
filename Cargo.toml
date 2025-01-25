@@ -24,7 +24,6 @@ bevy = ["dep:bevy_image", "dep:bevy_render"]
 image = { version = "0.25", default-features = false }
 derive_more = { version = "1", features = ["full"] }
 num-traits = "0.2"
-bitflags = "2.6"
 bit-vec = { version = "0.8" }
 
 [dependencies.bevy_image]
