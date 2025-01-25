@@ -1,4 +1,4 @@
-# binary_image
+# `binary_image`
 
 A Rust library for handling binary images (black and white).
 This library provides efficient structures and operations for

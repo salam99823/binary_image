@@ -11,7 +11,7 @@ pub enum BinaryView<'a, I: GenericImageView> {
     Image(I),
 }
 
-impl<'a, I, P> GenericImageView for BinaryView<'a, I>
+impl<I, P> GenericImageView for BinaryView<'_, I>
 where
     I: GenericImageView<Pixel = P>,
     P: Pixel,
@@ -41,7 +41,7 @@ where
     }
 }
 
-impl<'a, I, P> Deref for BinaryView<'a, I>
+impl<I, P> Deref for BinaryView<'_, I>
 where
     I: GenericImageView<Pixel = P>,
     P: Pixel,
