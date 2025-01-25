@@ -21,6 +21,7 @@ pub struct BinaryImage {
 }
 
 impl BinaryImage {
+    #[inline]
     #[must_use]
     pub fn new(width: u32, height: u32) -> Self {
         Self {
@@ -89,6 +90,17 @@ impl BinaryImage {
             }
         }
         out
+    }
+
+    #[inline]
+    #[must_use]
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+    #[inline]
+    #[must_use]
+    pub fn width(&self) -> u32 {
+        self.width
     }
 }
 
