@@ -27,7 +27,7 @@ num-traits = "0.2"
 bit-vec = { version = "0.8" }
 
 [dependencies.bevy_image]
-version = "0.15"
+version = "0.16"
 default-features = false
 optional = true
 
