@@ -11,17 +11,20 @@ impl TryFrom<BevyImage> for BinaryImage {
         let (width, height): (u32, u32) = (image.width(), image.height());
         match image.texture_descriptor.format {
             TextureFormat::Rg8Unorm => {
-                let image: Option<GrayAlphaImage> =
-                    ImageBuffer::from_raw(width, height, image.data);
+                let image: Option<GrayAlphaImage> = image
+                    .data
+                    .and_then(|data| ImageBuffer::from_raw(width, height, data));
                 image.map(Self::from)
             }
             TextureFormat::Rgba8UnormSrgb
             | TextureFormat::Bgra8UnormSrgb
             | TextureFormat::Bgra8Unorm => {
-                let image: Option<RgbaImage> = ImageBuffer::from_raw(width, height, image.data);
+                let image: Option<RgbaImage> = image
+                    .data
+                    .and_then(|data| ImageBuffer::from_raw(width, height, data));
                 image.map(Self::from)
             }
-            TextureFormat::R8Unorm => Some(Self::from_raw(width, height, &image.data)),
+            TextureFormat::R8Unorm => image.data.map(|data| Self::from_raw(width, height, &data)),
             // Throw and error if conversion isn't supported
             texture_format => return Err(IntoBinaryImageError::UnsupportedFormat(texture_format)),
         }
@@ -34,21 +37,23 @@ impl TryFrom<BevyImage> for BinaryImage {
 impl TryFrom<&BevyImage> for BinaryImage {
     type Error = IntoBinaryImageError;
     fn try_from(image: &BevyImage) -> Result<BinaryImage, Self::Error> {
-        let (width, height, data): (u32, u32, &[u8]) = (image.width(), image.height(), &image.data);
+        let (width, height, data): (u32, u32, Option<&[u8]>) =
+            (image.width(), image.height(), image.data.as_deref());
+
         match image.texture_descriptor.format {
             TextureFormat::Rg8Unorm => {
                 let image: Option<ImageBuffer<LumaA<u8>, &[u8]>> =
-                    ImageBuffer::from_raw(width, height, data);
+                    data.and_then(|data| ImageBuffer::from_raw(width, height, data));
                 image.map(Self::from)
             }
             TextureFormat::Rgba8UnormSrgb
             | TextureFormat::Bgra8UnormSrgb
             | TextureFormat::Bgra8Unorm => {
                 let image: Option<ImageBuffer<Rgba<u8>, &[u8]>> =
-                    ImageBuffer::from_raw(width, height, data);
+                    data.and_then(|data| ImageBuffer::from_raw(width, height, data));
                 image.map(Self::from)
             }
-            TextureFormat::R8Unorm => Some(Self::from_raw(width, height, data)),
+            TextureFormat::R8Unorm => data.map(|data| Self::from_raw(width, height, data)),
             // Throw and error if conversion isn't supported
             texture_format => return Err(IntoBinaryImageError::UnsupportedFormat(texture_format)),
         }
@@ -84,18 +89,20 @@ mod tests {
     fn test_conversion_rgba() {
         let bevy_image = BevyImage::from_buffer(
             include_bytes!("../assets/car.png"), // buffer
-            ImageType::Format(ImageFormat::Png),
+            ImageType::Format(
+                ImageFormat::from_image_crate_format(image::ImageFormat::Png)
+                    .expect("PNG is unsupported"),
+            ),
             CompressedImageFormats::default(),
             true,
             ImageSampler::default(),
             RenderAssetUsages::default(),
         )
         .unwrap();
-        let binary_image: Result<BinaryImage, IntoBinaryImageError> =
-            BinaryImage::try_from(&bevy_image);
 
-        assert!(binary_image.is_ok());
-        let binary_image = binary_image.unwrap();
+        let binary_image: BinaryImage =
+            BinaryImage::try_from(&bevy_image).expect("Conversion failed");
+
         assert_eq!(binary_image.width, bevy_image.width());
         assert_eq!(binary_image.height, bevy_image.height());
         // Additional checks on pixel data can be added here
