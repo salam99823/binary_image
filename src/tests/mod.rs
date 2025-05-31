@@ -1,4 +1,4 @@
-use image::{GenericImage, ImageBuffer, Luma};
+use image::{ImageBuffer, Luma};
 
 use super::*;
 mod pixel;
@@ -18,13 +18,11 @@ fn test_view<I: GenericImageView<Pixel = Bit>>(image: &I) {
 
 #[test]
 fn test_binary_image() {
-    let mut image = BinaryImage::from_raw(4, 4, &DATA);
+    let image = BinaryImage::from_raw(4, 4, &DATA);
 
     assert_eq!(image.width(), 4);
     assert_eq!(image.height(), 4);
     test_view(&image);
-
-    image.put_pixel(3, 3, Bit(false));
 }
 
 #[test]

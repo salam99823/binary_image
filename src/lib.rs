@@ -27,7 +27,7 @@ impl BinaryImage {
         Self {
             width,
             height,
-            buffer: BitVec::with_capacity((width * height) as usize),
+            buffer: BitVec::from_elem((width * height) as usize, false),
         }
     }
 
