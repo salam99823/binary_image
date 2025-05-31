@@ -32,6 +32,23 @@ impl BinaryImage {
     }
 
     #[must_use]
+    pub fn resize(&self, width: u32, height: u32) -> BinaryImage {
+        let mut new_image = BinaryImage::new(width, height);
+
+        for y in 0..height {
+            for x in 0..width {
+                let src_x = (x * self.width / width).min(self.width - 1);
+                let src_y = (y * self.height / height).min(self.height - 1);
+                let pixel = self.get_pixel(src_x, src_y);
+
+                new_image.put_pixel(x, y, pixel);
+            }
+        }
+
+        new_image
+    }
+
+    #[must_use]
     pub fn from_raw<T>(width: u32, height: u32, buffer: &[T]) -> Self
     where
         T: num_traits::Zero,
