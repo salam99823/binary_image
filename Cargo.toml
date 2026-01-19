@@ -32,7 +32,7 @@ default-features = false
 optional = true
 
 [dependencies.bevy_render]
-version = "0.16"
+version = "0.18"
 default-features = false
 optional = true
 
